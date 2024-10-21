@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dots and Boxes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* padding: 10px; */
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .board {
+            display: inline-grid;
+            gap: 5px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+
+        .line {
+            background-color: #666;
+            transition: background-color 0.3s ease;
+        }
+
+        .line.horizontal {
+            margin-top: 15px;
+            height: 5px;
+            width: 30px;
+        }
+
+        .line.vertical {
+            margin-left: 15px;
+            width: 5px;
+            height: 30px;
+        }
+
+        .line.clickable:hover {
+            background-color: #999;
+            cursor: pointer;
+        }
+
+        .line.player1 {
+            background-color: blue;
+        }
+
+        .line.player2 {
+            background-color: red;
+        }
+
+        .box {
+            font-size: 20px;
+        }
+
+        .box.player1 {
+            color: rgb(255, 255, 255);
+            background-color: rgb(0, 0, 255);
+            border-radius: 5px;
+        }
+
+        .box.player2 {
+            color: rgb(255, 255, 255);
+            background-color: rgb(254, 0, 0);
+            border-radius: 5px;
+        }
+
+        #current-player, #winner {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        #restart-game {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #restart-game:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dots and Boxes</h1>
+    <h2>{{ game.mode }} - {{ game.player1 }} vs {{ game.player2 }}</h2>
+    <p id="current-player">Current Player: {{ game.current_player }}</p>
+    <p id="winner" style="display: none;"></p>
+    
+    <div id="game-board" class="board"></div>
+
+    <button id="restart-game">Restart Game</button>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var player1 = "{{ game.player1 }}";
+            var player2 = "{{ game.player2 }}";
+            var player1Moves = {{ player1_moves|safe }};
+            var player2Moves = {{ player2_moves|safe }};
+
+            function updateBoard(board) {
+                var $gameBoard = $('#game-board');
+                $gameBoard.empty();
+                $gameBoard.css('grid-template-columns', `repeat(${board[0].length}, auto)`);
+
+                for (var i = 0; i < board.length; i++) {
+                    for (var j = 0; j < board[i].length; j++) {
+                        var $cell = $('<div>').addClass('cell').attr('data-row', i).attr('data-col', j);
+                        
+                        if (board[i][j] === '.') {
+                            $cell.append($('<div>').addClass('dot'));
+                        } else if (board[i][j] === '+') {
+                            var isHorizontal = i % 2 === 0;
+                            $cell.addClass('line clickable ' + (isHorizontal ? 'horizontal' : 'vertical'));
+                        } else if (board[i][j] === ' ') {
+                            $cell.addClass('box');
+                        } else if (board[i][j] === player1[0].toUpperCase()) {
+                            $cell.text(board[i][j]).addClass('box player1');
+                        } else if (board[i][j] === player2[0].toUpperCase()) {
+                            $cell.text(board[i][j]).addClass('box player2');
+                        } else {
+                            var isHorizontal = i % 2 === 0;
+                            $cell.addClass('line ' + (isHorizontal ? 'horizontal' : 'vertical'));
+                            if (player1Moves.some(move => move[0] === i && move[1] === j)) {
+                                $cell.addClass('player1');
+                            } else if (player2Moves.some(move => move[0] === i && move[1] === j)) {
+                                $cell.addClass('player2');
+                            }
+                        }
+                        
+                        $gameBoard.append($cell);
+                    }
+                }
+            }
+
+            function makeMove(row, col) {
+                $.post("", {
+                    'row': row,
+                    'col': col,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                }, function(data) {
+                    if (data.success) {
+                        player1Moves = data.player1_moves;
+                        player2Moves = data.player2_moves;
+                        updateBoard(data.board);
+                        $('#current-player').text('Current Player: ' + data.current_player);
+                        if (data.winner) {
+                            $('#winner').text('Winner: ' + data.winner).show();
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                });
+            }
+
+
+            function restartGame() {
+                $.post("{% url 'restart_game' game.id %}", {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                }, function(data) {
+                    if (data.success) {
+                        player1Moves = data.player1_moves;
+                        player2Moves = data.player2_moves;
+                        updateBoard(data.board);
+                        $('#current-player').text('Current Player: ' + data.current_player);
+                        $('#winner').text('').hide();
+                    } else {
+                        alert('Failed to restart the game. Please try again.');
+                    }
+                });
+            }
+
+            
+
+            // Initial board setup
+            updateBoard({{ board|safe }});
+
+            // Use event delegation for click events
+            $('#game-board').on('click', '.line.clickable', function() {
+                var row = $(this).data('row');
+                var col = $(this).data('col');
+                makeMove(row, col);
+            });
+
+            function refreshPage() {
+                location.reload();
+            }
+            function refreshGameState() {
+                $.get("{% url 'game_state' game.id %}", function(data) {
+                    updateBoard(data.board);
+                    $('#current-player').text('Current Player: ' + data.current_player);
+                    $('#player1-score').text('Player 1 Score: ' + data.player1_score);
+                    $('#player2-score').text('Player 2 Score: ' + data.player2_score);
+                    if (data.winner) {
+                        $('#winner').text('Winner: ' + data.winner).show();
+                    } else {
+                        $('#winner').hide();
+                    }
+                });
+            }
+            setInterval(refreshGameState, 2000); // Refresh every 5 seconds
+            
+
+
+            // Add click event listener for the restart button
+            $('#restart-game').click(restartGame);
+        });
+    </script>
+</body>
+</html> 

@@ -1,161 +1,205 @@
 <!-- game/templates/game/game_entry.html -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dots and Boxes - New Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        .container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        label {
-            font-weight: bold;
-        }
-        input[type="text"], select {
-            padding: 0.5rem;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            padding: 0.5rem 1rem;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Start a New Game</h1>
-        <form action="{% url 'create_game' %}" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div>
-                <label for="game_mode">Game Mode:</label>
-                <select id="game_mode" name="game_mode" required onchange="toggleInputs()">
-                    <option value="PVP">Person vs Person</option>
-                    <option value="PVA">Person vs Agent</option>
-                    <option value="AVA">Agent vs Agent</option>
-                </select>
-            </div>
-            <div id="player1_div">
-                <label for="player1">Player 1 Name:</label>
-                <input type="text" id="player1" name="player1" required>
-            </div>
-            <div id="player2_div">
-                <label for="player2">Player 2 Name:</label>
-                <input type="text" id="player2" name="player2" required>
-            </div>
-            <div id="pva_options" class="hidden">
-                <label>
-                    <input type="checkbox" id="use_implemented_agent" name="use_implemented_agent" checked>
-                    Use Implemented Agent
-                </label>
-                <div id="pva_agent_upload" class="hidden">
-                    <label for="pva_agent_file">Upload Custom Agent (Python or EXE):</label>
-                    <input type="file" id="pva_agent_file" name="pva_agent_file" accept=".py,.exe">
-                </div>
-            </div>
-            <div id="ava_options" class="hidden">
-                <div>
-                    <label for="agent1_file">Upload Agent 1 (Python or EXE):</label>
-                    <input type="file" id="agent1_file" name="agent1_file" accept=".py,.exe">
-                </div>
-                <div>
-                    <label for="agent2_file">Upload Agent 2 (Python or EXE):</label>
-                    <input type="file" id="agent2_file" name="agent2_file" accept=".py,.exe">
-                </div>
-            </div>
-            <button type="submit">Start Game</button>
-        </form>
-    </div>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Dots and Boxes - New Game</title>
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				margin: 0;
+				background-color: #f0f0f0;
+			}
+			.container {
+				background-color: white;
+				padding: 2rem;
+				border-radius: 10px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			}
+			h1 {
+				text-align: center;
+				color: #333;
+			}
+			form {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+			}
+			label {
+				font-weight: bold;
+			}
+			input[type="text"],
+			select {
+				padding: 0.5rem;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+			}
+			button {
+				padding: 0.5rem 1rem;
+				background-color: #4caf50;
+				color: white;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+				font-size: 1rem;
+			}
+			button:hover {
+				background-color: #45a049;
+			}
+			.hidden {
+				display: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<h1>Start a New Game</h1>
+			<form
+				action="{% url 'create_game' %}"
+				method="post"
+				enctype="multipart/form-data"
+			>
+				{% csrf_token %}
+				<div>
+					<label for="game_mode">Game Mode:</label>
+					<select
+						id="game_mode"
+						name="game_mode"
+						required
+						onchange="toggleInputs()"
+					>
+						<option value="PVP">Person vs Person</option>
+						<option value="PVA">Person vs Agent</option>
+						<option value="AVA">Agent vs Agent</option>
+					</select>
+				</div>
+				<div id="player1_div">
+					<label for="player1">Player 1 Name:</label>
+					<input type="text" id="player1" name="player1" required />
+				</div>
+				<div id="player2_div">
+					<label for="player2">Player 2 Name:</label>
+					<input type="text" id="player2" name="player2" required />
+				</div>
+				<div id="pva_options" class="hidden">
+					<label>
+						<input
+							type="checkbox"
+							id="use_implemented_agent"
+							name="use_implemented_agent"
+							checked
+						/>
+						Use Implemented Agent
+					</label>
+					<div id="pva_agent_upload" class="hidden">
+						<label for="pva_agent_file"
+							>Upload Custom Agent (Python or EXE):</label
+						>
+						<input
+							type="file"
+							id="pva_agent_file"
+							name="pva_agent_file"
+							accept=".py,.exe"
+						/>
+					</div>
+				</div>
+				<div id="ava_options" class="hidden">
+					<div>
+						<label for="agent1_file">Upload Agent 1 (Python or EXE):</label>
+						<input
+							type="file"
+							id="agent1_file"
+							name="agent1_file"
+							accept=".py,.exe"
+						/>
+					</div>
+					<div>
+						<label for="agent2_file">Upload Agent 2 (Python or EXE):</label>
+						<input
+							type="file"
+							id="agent2_file"
+							name="agent2_file"
+							accept=".py,.exe"
+						/>
+					</div>
+				</div>
+				<button type="submit">Start Game</button>
+			</form>
+		</div>
 
-    <script>
-        function toggleInputs() {
-            const gameMode = document.getElementById('game_mode').value;
-            const player1Div = document.getElementById('player1_div');
-            const player2Div = document.getElementById('player2_div');
-            const pvaOptions = document.getElementById('pva_options');
-            const avaOptions = document.getElementById('ava_options');
-            const useImplementedAgent = document.getElementById('use_implemented_agent');
-            const pvaAgentUpload = document.getElementById('pva_agent_upload');
-            const player2Input = document.getElementById('player2');
-    
-            player1Div.classList.add('hidden');
-            player2Div.classList.add('hidden');
-            pvaOptions.classList.add('hidden');
-            avaOptions.classList.add('hidden');
-    
-            if (gameMode === 'PVP') {
-                player1Div.classList.remove('hidden');
-                player2Div.classList.remove('hidden');
-                player2Input.required = true;
-            } else if (gameMode === 'PVA') {
-                player1Div.classList.remove('hidden');
-                pvaOptions.classList.remove('hidden');
-                player2Input.value = 'Agent';
-                player2Input.required = false;
-            } else if (gameMode === 'AVA') {
-                avaOptions.classList.remove('hidden');
-                player2Input.required = false;
-            }
-    
-            useImplementedAgent.addEventListener('change', function() {
-                if (this.checked) {
-                    pvaAgentUpload.classList.add('hidden');
-                } else {
-                    pvaAgentUpload.classList.remove('hidden');
-                }
-            });
-        }
-    
-        // Call the function on page load to set the initial state
-        toggleInputs();
-    
-        // Add event listener to the game mode select
-        document.getElementById('game_mode').addEventListener('change', toggleInputs);
-    
-        // Add form submission handler
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const gameMode = document.getElementById('game_mode').value;
-            const useImplementedAgent = document.getElementById('use_implemented_agent');
-            const pvaAgentFile = document.getElementById('pva_agent_file');
-    
-            if (gameMode === 'PVA' && !useImplementedAgent.checked && !pvaAgentFile.files.length) {
-                e.preventDefault();
-                alert('Please upload a custom agent file or use the implemented agent.');
-            }
-        });
-    </script>
-</body>
+		<script>
+			function toggleInputs() {
+				const gameMode = document.getElementById("game_mode").value;
+				const player1Div = document.getElementById("player1_div");
+				const player2Div = document.getElementById("player2_div");
+				const pvaOptions = document.getElementById("pva_options");
+				const avaOptions = document.getElementById("ava_options");
+				const useImplementedAgent = document.getElementById(
+					"use_implemented_agent"
+				);
+				const pvaAgentUpload = document.getElementById("pva_agent_upload");
+				const player2Input = document.getElementById("player2");
+
+				player1Div.classList.add("hidden");
+				player2Div.classList.add("hidden");
+				pvaOptions.classList.add("hidden");
+				avaOptions.classList.add("hidden");
+
+				if (gameMode === "PVP") {
+					player1Div.classList.remove("hidden");
+					player2Div.classList.remove("hidden");
+					player2Input.required = true;
+				} else if (gameMode === "PVA") {
+					player1Div.classList.remove("hidden");
+					pvaOptions.classList.remove("hidden");
+					player2Input.value = "Agent";
+					player2Input.required = false;
+				} else if (gameMode === "AVA") {
+					avaOptions.classList.remove("hidden");
+					player2Input.required = false;
+				}
+
+				useImplementedAgent.addEventListener("change", function () {
+					if (this.checked) {
+						pvaAgentUpload.classList.add("hidden");
+					} else {
+						pvaAgentUpload.classList.remove("hidden");
+					}
+				});
+			}
+
+			// Call the function on page load to set the initial state
+			toggleInputs();
+
+			// Add event listener to the game mode select
+			document
+				.getElementById("game_mode")
+				.addEventListener("change", toggleInputs);
+
+			// Add form submission handler
+			document.querySelector("form").addEventListener("submit", function (e) {
+				const gameMode = document.getElementById("game_mode").value;
+				const useImplementedAgent = document.getElementById(
+					"use_implemented_agent"
+				);
+				const pvaAgentFile = document.getElementById("pva_agent_file");
+
+				if (
+					gameMode === "PVA" &&
+					!useImplementedAgent.checked &&
+					!pvaAgentFile.files.length
+				) {
+					e.preventDefault();
+					alert(
+						"Please upload a custom agent file or use the implemented agent."
+					);
+				}
+			});
+		</script>
+	</body>
 </html>

@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dots and Boxes - Game List</title>
-</head>
-<body>
-    <h1>Dots and Boxes Games</h1>
-    {% if games %}
-        <ul>
-        {% for game in games %}
-            <li><a href="{% url 'game_view' game.id %}">Game {{ game.id }}: {{ game.mode }} - {{ game.player1 }} vs {{ game.player2 }}</a></li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No games available.</p>
-    {% endif %}
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Dots and Boxes - Game List</title>
+	</head>
+	<body>
+		<h1>Dots and Boxes Games</h1>
+		{% if games %}
+		<ul>
+			{% for game in games %}
+			<li>
+				<a href="{% url 'game_view' game.id %}"
+					>Game {{ game.id }}: {{ game.mode }} - {{ game.player1 }} vs {{
+					game.player2 }}</a
+				>
+			</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<p>No games available.</p>
+		{% endif %}
+	</body>
 </html>

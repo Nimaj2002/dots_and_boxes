@@ -118,7 +118,8 @@
 
 		<div id="game-board" class="board"></div>
 
-		<button id="restart-game">Restart Game</button>
+		<!-- <button id="restart-game" href="/state/">Restart Game</button> -->
+		<a id="restart-game" href="/">Restart</a>
 
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script>
@@ -177,6 +178,8 @@
 			                if (data.winner) {
 			                    $('#winner').text('Winner: ' + data.winner).show();
 			                }
+							updateBoard(data.board);
+							refreshPage()
 			            } else {
 			                alert(data.message);
 			            }

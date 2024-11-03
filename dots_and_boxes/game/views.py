@@ -6,7 +6,7 @@ from django.conf import settings
 from django.core.files.storage import default_storage
 import json
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.http import require_POST
 from .serializers import GameStateSerializer, MoveSerializer
 from .models import Game
@@ -16,6 +16,9 @@ import threading
 import sys
 
 logger = logging.getLogger(__name__)
+
+# Global variable to keep track of the running agent process
+running_agent_process = None
 
 def game_view(request, game_id):
     game = Game.objects.get(pk=game_id)
@@ -67,6 +70,13 @@ def restart_game(request, game_id):
     }) 
 
 def game_entry(request):
+    global running_agent_process
+    # Check if there is a running agent process
+    if running_agent_process is not None:
+        # Terminate the running process
+        running_agent_process.terminate()
+        running_agent_process = None  # Reset the variable
+
     return render(request, 'game/game_entry.html')
 
 def create_game(request):
@@ -124,7 +134,10 @@ def create_game(request):
     return redirect('game_entry')
 
 def run_agent(file_path, game_id, player_name, server_url, port):
-    subprocess.Popen([sys.executable, 'agent_wrapper.py', file_path, str(game_id), player_name, server_url, port])
+    global running_agent_process
+    # Run the agent script as a separate process
+    running_agent_process = subprocess.Popen([sys.executable, file_path, server_url, port, str(game_id), player_name])
+
 
 class GameStateView(APIView):
     def get(self, request, game_id):

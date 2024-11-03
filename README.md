@@ -50,19 +50,20 @@ A Django-based web application implementing the classic Dots and Boxes game, sup
 ## Installation
 
 1. Clone the repository
-2. Install dependencies:
+2. create a virtual environment (recomended)
+3. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Run migrations:
+4. Run migrations:
 
 ```bash
 python manage.py migrate
 ```
 
-4. Start the development server:
+5. Start the development server:
 
 ```bash
 python manage.py runserver
@@ -105,6 +106,8 @@ python manage.py runserver
     [".", "+", ".", "+", ".", "+", ".", "+", "."],
 ]
 ```
+
+! in player vs agent mode after agents move you need to update the website !
 
 ### Dependencies
 

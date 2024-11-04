@@ -126,6 +126,8 @@
 			$(document).ready(function() {
 			    var player1 = "{{ game.player1 }}";
 			    var player2 = "{{ game.player2 }}";
+			    var currentPlayer = "{{ game.current_player }}"; // Store the current player
+
 			    var player1Moves = {{ player1_moves|safe }};
 			    var player2Moves = {{ player2_moves|safe }};
 
@@ -171,15 +173,12 @@
 			            'csrfmiddlewaretoken': '{{ csrf_token }}'
 			        }, function(data) {
 			            if (data.success) {
-			                player1Moves = data.player1_moves;
-			                player2Moves = data.player2_moves;
-			                updateBoard(data.board);
-			                $('#current-player').text('Current Player: ' + data.current_player);
-			                if (data.winner) {
-			                    $('#winner').text('Winner: ' + data.winner).show();
-			                }
-							updateBoard(data.board);
-							refreshPage()
+			                // Optionally, you can check player moves here if needed
+			                // player1Moves = data.player1_moves;
+			                // player2Moves = data.player2_moves;
+
+			                // Refresh the page to get the latest game state
+			                location.reload(); // This will reload the page
 			            } else {
 			                alert(data.message);
 			            }
@@ -224,6 +223,8 @@
 			            $('#current-player').text('Current Player: ' + data.current_player);
 			            $('#player1-score').text('Player 1 Score: ' + data.player1_score);
 			            $('#player2-score').text('Player 2 Score: ' + data.player2_score);
+						// location.reload(); // This will reload the page
+						updateBoard(data.board);
 			            if (data.winner) {
 			                $('#winner').text('Winner: ' + data.winner).show();
 			            } else {
@@ -231,12 +232,24 @@
 			            }
 			        });
 			    }
-			    setInterval(refreshGameState, 2000); // Refresh every 5 seconds
+			    setInterval(refreshGameState, 5000); // Refresh every 5 seconds
 
 
 
 			    // Add click event listener for the restart button
 			    $('#restart-game').click(restartGame);
+
+			    function checkCurrentPlayer() {
+			        $.get("{% url 'game_state' game.id %}", function(data) {
+			            if (data.current_player !== currentPlayer) {
+			                currentPlayer = data.current_player; // Update the current player variable
+			                location.reload(); // Reload the page if the current player has changed
+			            }
+			        });
+			    }
+
+			    // Call checkCurrentPlayer every few seconds
+			    setInterval(checkCurrentPlayer, 5000); // Check every 5 seconds
 			});
 		</script>
 	</body>
